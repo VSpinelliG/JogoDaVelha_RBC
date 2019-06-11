@@ -4,8 +4,9 @@
 using namespace std;
 
 typedef struct {
-    int posJogada;
     char jogador;
+    int linha;
+    int coluna;
 } Movimento;
 
 class Jogada {
