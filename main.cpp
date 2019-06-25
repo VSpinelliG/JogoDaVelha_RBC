@@ -52,8 +52,24 @@ int* retornaVetor(){
         int r = rand() % 9;
         swap(vetor[r], vetor[i]);
     }
-    
+    for (int i = 0; i < 9; i++) cout << vetor[i] << ' ';
+    cout << endl;
     return vetor;
+}
+
+char** novoTabuleiro(){
+    char** tabuleiro = new char*[3];
+    for(int lin = 0; lin < 3; lin++) {
+        tabuleiro[lin] = new char[3];
+    }
+    
+    for (int lin = 0; lin < 3; lin++) {
+        for (int col = 0; col < 3; col++) {
+            tabuleiro[lin][col] = '-';
+        }
+    }
+    
+    return tabuleiro;
 }
 
 int main() {
@@ -63,12 +79,13 @@ int main() {
     cout << "2 - Maquina contra Maquina (Treino)" << endl;
     cout << "Selecione o modo de jogo: ";
     cin >> tipoJogo;
-    
+    /*
     //Criando o tabuleiro
     char** tabuleiro = new char*[3];
     for(int lin = 0; lin < 3; lin++) {
         tabuleiro[lin] = new char[3];
     }
+    */
     
     switch(tipoJogo) {
         case 0:
@@ -85,12 +102,20 @@ int main() {
             int i = 0;
             
             while(i < qtdJogos) {
+                
+                char** tabuleiro = novoTabuleiro();
+                
                 bool jogoEmAndamento = true;
                 char jogador1 = 'X';
                 char jogador2 = 'O';
                 int jogadorInicial = rand() % 2 + 1;
+                
                 //cout << jogadorInicial << endl;
-                if (jogadorInicial == 2) swap(jogador1, jogador2);
+                if (jogadorInicial == 2) {
+                    swap(jogador1, jogador2);
+                }
+                
+                cout << "O jogador \'" << jogador1 << "\' irá começar!" << endl;
                 
                 int* vetor = retornaVetor();
                 Movimento* movimentos = new Movimento[9];
@@ -98,17 +123,24 @@ int main() {
                 int linha = 0;
                 int coluna = 0;
                 
-                while(jogoEmAndamento){
+                while(jogoEmAndamento) {
                     linha = retornaLinha(vetor[nJogada]);
                     coluna = retornaColuna(vetor[nJogada]);
-                    cout << linha << " " << coluna << endl;
+                    //cout << linha << " " << coluna << " " << vetor[nJogada] << " " << nJogada << endl;
+                    
                     movimentos[nJogada].jogador = jogador1;
                     movimentos[nJogada].linha = linha;
                     movimentos[nJogada].coluna = coluna;
+                    
                     tabuleiro[linha][coluna] = jogador1;
+                    
                     if (verificaGanhador(jogador1, tabuleiro) == jogador1){
-                        cout << "Jogador 1 venceu!" << endl;
+                        cout << "Jogador \'" << jogador1 << "\' venceu!" << endl;
                         jogoEmAndamento = false;
+                    }
+                    else if(verificaGanhador(jogador1, tabuleiro) == 'v' and nJogada == 8){
+                        jogoEmAndamento = false;
+                        cout << "Deu velha :(" << endl;
                     }
                     else{
                         swap(jogador1, jogador2);
@@ -116,7 +148,9 @@ int main() {
                     }
                 }
                 ++i;
+                
                 delete[] movimentos;
+                delete[] vetor;
                 
                 for (int k = 0; k < 3; ++k){
                     for (int j = 0; j < 3; ++j){
@@ -124,7 +158,15 @@ int main() {
                     }
                     cout << endl;
                 }
+                
+                // Desalocando o tabuleiro
+                for (int v = 0; v < 3; v++) {
+                    delete[] tabuleiro[v];
+                }                
+                delete[] tabuleiro;
+                
             }
+            
             break;
     }
     
