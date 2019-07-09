@@ -89,51 +89,38 @@ int main() {
     
     switch(tipoJogo) {
         case 0:
-            // Jogador contra jogador
-            break;
-        case 1:
-            // Jogador contra Maquina
-            break;
-        case 2:
-            //Maquina contra maquina
-            int qtdJogos;
-            cout << "Digite a quantidade de jogos que a máquina jogará contra a máquina: ";
-            cin >> qtdJogos;
-            int i = 0;
-            
-            while(i < qtdJogos) {
-                
-                char** tabuleiro = novoTabuleiro();
-                
+            {     
+                // Jogador contra jogador
                 bool jogoEmAndamento = true;
                 char jogador1 = 'X';
                 char jogador2 = 'O';
-                int jogadorInicial = rand() % 2 + 1;
-                
-                //cout << jogadorInicial << endl;
-                if (jogadorInicial == 2) {
-                    swap(jogador1, jogador2);
-                }
-                
+                int linha, coluna;
+                if ((rand() % 2 + 1) == 2) swap(jogador1, jogador2);
                 cout << "O jogador \'" << jogador1 << "\' irá começar!" << endl;
-                
-                int* vetor = retornaVetor();
+
+                // Inicializando o tabuleiro
+                char** tabuleiro = novoTabuleiro();
+
+                // Vetor que armazena informações dos movimentos
                 Movimento* movimentos = new Movimento[9];
+
+                // Controla o numero da jogada
                 int nJogada = 0;
-                int linha = 0;
-                int coluna = 0;
-                
-                while(jogoEmAndamento) {
-                    linha = retornaLinha(vetor[nJogada]);
-                    coluna = retornaColuna(vetor[nJogada]);
-                    //cout << linha << " " << coluna << " " << vetor[nJogada] << " " << nJogada << endl;
-                    
+                while(jogoEmAndamento){
+                    for (int k = 0; k < 3; ++k){
+                        for (int j = 0; j < 3; ++j){
+                            cout << tabuleiro[k][j] << " ";
+                        }
+                        cout << endl;
+                    }
+                    cout << "Jogador \'" << jogador1 << "\', digite o movimento [linha] [coluna]: ";
+                    cin >> linha >> coluna;
+                    tabuleiro[linha][coluna] = jogador1;
+
                     movimentos[nJogada].jogador = jogador1;
                     movimentos[nJogada].linha = linha;
                     movimentos[nJogada].coluna = coluna;
-                    
-                    tabuleiro[linha][coluna] = jogador1;
-                    
+
                     if (verificaGanhador(jogador1, tabuleiro) == jogador1){
                         cout << "Jogador \'" << jogador1 << "\' venceu!" << endl;
                         jogoEmAndamento = false;
@@ -143,33 +130,95 @@ int main() {
                         cout << "Deu velha :(" << endl;
                     }
                     else{
+                        system("clear");
                         swap(jogador1, jogador2);
                         ++nJogada;
                     }
                 }
-                ++i;
-                
-                delete[] movimentos;
-                delete[] vetor;
-                
-                for (int k = 0; k < 3; ++k){
-                    for (int j = 0; j < 3; ++j){
-                        cout << tabuleiro[k][j] << " ";
-                    }
-                    cout << endl;
-                }
-                
                 // Desalocando o tabuleiro
                 for (int v = 0; v < 3; v++) {
                     delete[] tabuleiro[v];
                 }                
-                delete[] tabuleiro;
-                
+                delete[] tabuleiro; 
             }
-            
+            break;
+        case 1:
+            cout << "Aqui não"<< endl;
+            // Jogador contra Maquina
+            break;
+        case 2:
+            {
+                //Maquina contra maquina
+                int qtdJogos;
+                cout << "Digite a quantidade de jogos que a máquina jogará contra a máquina: ";
+                cin >> qtdJogos;
+                int i = 0;
+                
+                while(i < qtdJogos) {
+                    
+                    char** tabuleiro = novoTabuleiro();
+                    
+                    bool jogoEmAndamento = true;
+                    char jogador1 = 'X';
+                    char jogador2 = 'O';
+                    int jogadorInicial = rand() % 2 + 1;
+                    
+                    //cout << jogadorInicial << endl;
+                    if (jogadorInicial == 2) swap(jogador1, jogador2);                
+                    
+                    cout << "O jogador \'" << jogador1 << "\' irá começar!" << endl;
+                    
+                    int* vetor = retornaVetor();
+                    Movimento* movimentos = new Movimento[9];
+                    int nJogada = 0;
+                    int linha = 0;
+                    int coluna = 0;
+                    
+                    while(jogoEmAndamento) {
+                        linha = retornaLinha(vetor[nJogada]);
+                        coluna = retornaColuna(vetor[nJogada]);
+                        //cout << linha << " " << coluna << " " << vetor[nJogada] << " " << nJogada << endl;
+                        
+                        movimentos[nJogada].jogador = jogador1;
+                        movimentos[nJogada].linha = linha;
+                        movimentos[nJogada].coluna = coluna;
+                        
+                        tabuleiro[linha][coluna] = jogador1;
+                        
+                        if (verificaGanhador(jogador1, tabuleiro) == jogador1){
+                            cout << "Jogador \'" << jogador1 << "\' venceu!" << endl;
+                            jogoEmAndamento = false;
+                        }
+                        else if(verificaGanhador(jogador1, tabuleiro) == 'v' and nJogada == 8){
+                            jogoEmAndamento = false;
+                            cout << "Deu velha :(" << endl;
+                        }
+                        else{
+                            swap(jogador1, jogador2);
+                            ++nJogada;
+                        }
+                    }
+                    ++i;
+                    
+                    delete[] movimentos;
+                    delete[] vetor;
+                    
+                    for (int k = 0; k < 3; ++k){
+                        for (int j = 0; j < 3; ++j){
+                            cout << tabuleiro[k][j] << " ";
+                        }
+                        cout << endl;
+                    }
+                
+
+                    // Desalocando o tabuleiro
+                    for (int v = 0; v < 3; v++) {
+                        delete[] tabuleiro[v];
+                    }                
+                    delete[] tabuleiro;                
+                }
+            }
             break;
     }
-    
-
     return 0;
 }
