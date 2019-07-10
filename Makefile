@@ -20,4 +20,4 @@ hash.o: hash.cpp
 all: main
 
 clean:
-	rm -f *.o
+	rm -f *.o main
