@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <cstdlib>
 using namespace std;
 
 
@@ -113,7 +115,12 @@ public:
     string recupera(Movimento* m) {
         int h;
         h = funcaoHash(m);
+        
         if ((elementos[h] != NULL) and (elementos[h]->movimento == m)) {
+			for (int i = 0; i < 9; i++)
+			{
+				cout << elementos[h]->movimento[i].linha << " " << elementos[h]->movimento[i].coluna << endl;
+			}
             return "JA ESTA NO HASH";
         }
         else {
@@ -139,7 +146,7 @@ public:
         h = funcaoHash(m);
 
         if(recupera(m) == "JA ESTA NO HASH"){
-
+			
             if ((elementos[h] != NULL) and (elementos[h]->movimento == m)) {
                 elementos[h]->nVitorias += 1;
             }
@@ -211,10 +218,47 @@ public:
     }
 
     void carregarDadosArquivo(){
-
+		ifstream myFile("jogos.bin", ios::in);
+		system("clear");
+		if(myFile){
+			cout << "Procurando jogos em arquivo." << endl;
+			myFile.seekg(0);
+			Movimento* mov;
+			char winner;
+			while(myFile.read(reinterpret_cast<char*>(mov), 9*sizeof(Movimento))){
+				myFile.read(reinterpret_cast<char*>(&winner), sizeof(char));
+				//~ myFile.write(reinterpret_cast<char*>(&nVit), sizeof(int));
+				insere(mov, winner);
+			}
+			
+			myFile.close();
+		}
+		else{
+			cout << "Arquivo nao encontrado." << endl << endl;
+		}
     }
 
-    bool gravarDadosArquivo(){
-        return true;
+    void gravarDadosArquivo(){
+        ofstream myFile("jogos.bin", ios::trunc);
+		myFile.seekp(0);
+		noh* atual;
+		Movimento* mov;
+		char winner;
+		//~ int nVit = 0;
+		for(int i = 0; i < capacidade; ++i){
+			atual = elementos[i];
+			if(atual != NULL){				
+				while (atual != NULL) {
+					mov = atual->movimento;
+					winner = atual->vencedor;
+					//~ nVit = elementos[i]->nVitorias
+					myFile.write(reinterpret_cast<char*>(mov), 9*sizeof(Movimento));
+					myFile.write(reinterpret_cast<char*>(&winner), sizeof(char));
+					//~ myFile.write(reinterpret_cast<char*>(&nVit), sizeof(int));
+					atual = atual->proximo;
+				}
+			}
+		}
+		myFile.close();
     }
 };

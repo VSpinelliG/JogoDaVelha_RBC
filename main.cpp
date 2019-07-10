@@ -85,7 +85,10 @@ int main() {
         tabuleiro[lin] = new char[3];
     }
     */
-    tabelaHash minhaHash;;
+    tabelaHash minhaHash;
+    minhaHash.carregarDadosArquivo();
+    minhaHash.percorre();
+    
 
 
     switch(tipoJogo) {
@@ -224,5 +227,6 @@ int main() {
     }
 
     minhaHash.percorre();
+    minhaHash.gravarDadosArquivo();
     return 0;
 }
