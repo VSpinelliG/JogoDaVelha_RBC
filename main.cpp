@@ -1,6 +1,5 @@
 #include <iostream>
-#include <list>
-#include "Jogada.hpp"
+#include "hash.cpp"
 #include <cstdlib>
 
 using namespace std;
@@ -86,7 +85,9 @@ int main() {
         tabuleiro[lin] = new char[3];
     }
     */
-    
+    tabelaHash minhaHash;;
+
+
     switch(tipoJogo) {
         case 0:
             {     
@@ -197,10 +198,11 @@ int main() {
                             swap(jogador1, jogador2);
                             ++nJogada;
                         }
-                    }
+                    }                    
+                    minhaHash.insere(movimentos, jogador1);
                     ++i;
                     
-                    delete[] movimentos;
+                    //delete[] movimentos;
                     delete[] vetor;
                     
                     for (int k = 0; k < 3; ++k){
@@ -220,5 +222,7 @@ int main() {
             }
             break;
     }
+
+    minhaHash.percorre();
     return 0;
 }

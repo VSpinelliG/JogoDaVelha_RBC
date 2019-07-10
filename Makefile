@@ -5,7 +5,7 @@
 CPP = g++
 CPPFLAGS = -Wall -Wconversion
 
-OBJ = main.o Jogada.o
+OBJ = main.o hash.o
 
 # dois pontos indica dependencia
 main: $(OBJ)
@@ -14,8 +14,8 @@ main: $(OBJ)
 main.o: main.cpp
 	$(CPP) $(CPPFLAGS) -c main.cpp -o main.o
 
-Jogada.o: Jogada.cpp
-	$(CPP)  $(CPPFLAGS) -c Jogada.cpp -o Jogada.o
+hash.o: hash.cpp
+	$(CPP)  $(CPPFLAGS) -c hash.cpp -o hash.o
 
 all: main
 
