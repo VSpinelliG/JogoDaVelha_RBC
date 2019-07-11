@@ -202,7 +202,7 @@ int main() {
 
                         } else if(jogador1 == 'C') {
                             // Vez do usuario jogar
-                            int pos = minhaHash.obterProximoMovimento(movimentos, nJogada+1);
+                            int pos = minhaHash.obterProximoMovimento(movimentos, nJogada);
                             if(pos == -1) pos = minhaHash.gerarMovimentoAleatorio(tabuleiro);
                             linha = retornaLinha(pos);
                             coluna = retornaColuna(pos);
@@ -332,7 +332,7 @@ int main() {
         cout << endl;
     }
 
-    //minhaHash.percorre();
+    minhaHash.percorre();
     minhaHash.gravarDadosArquivo();
     
     return 0;

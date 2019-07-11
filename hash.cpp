@@ -13,7 +13,7 @@ typedef struct {
 
 class noh {
 friend class tabelaHash;
-friend inline bool operator==(const noh& noh1, const noh& noh2);
+//~ friend inline bool operator==(const noh& noh1, const noh& noh2);
     private:
         /* Vetor de 9 posições, as posições são as seguintes
         *  0 | 1 | 2
@@ -44,14 +44,14 @@ friend inline bool operator==(const noh& noh1, const noh& noh2);
 };
 
 // Sobrecarga de operadores
-inline bool operator==(const noh& noh1, const noh& noh2){
-    for (int i = 0; i < 9; i++) {
-        if(noh1.movimento[i].coluna != noh2.movimento[i].coluna) return false;
-        else if(noh1.movimento[i].linha != noh2.movimento[i].linha) return false;
-        else if(noh1.movimento[i].jogador != noh2.movimento[i].jogador) return false;
-    }    
-    return true;
-}
+//~ inline bool operator==(const noh& noh1, const noh& noh2){
+    //~ for (int i = 0; i < 9; i++) {
+        //~ if(noh1.movimento[i].coluna != noh2.movimento[i].coluna) return false;
+        //~ else if(noh1.movimento[i].linha != noh2.movimento[i].linha) return false;
+        //~ else if(noh1.movimento[i].jogador != noh2.movimento[i].jogador) return false;
+    //~ }    
+    //~ return true;
+//~ }
 
 inline int funcaoHash(Movimento* m) {
     return m[0].linha*3 + m[0].coluna;    
@@ -116,26 +116,35 @@ public:
             cout << "Item ja esta na tabela2" << endl;
         }
     }
+    
+    bool comparaMovimentos(Movimento* noh1, Movimento* noh2){
+		for (int i = 0; i < 9; i++) {
+			if(noh1[i].coluna != noh2[i].coluna) return false;
+			else if(noh1[i].linha != noh2[i].linha) return false;
+			else if(noh1[i].jogador != noh2[i].jogador) return false;
+		}    
+		return true;
+	}
 
     //recupera um valor associado a uma chave
     string recupera(Movimento* m) {
         int h;
         h = funcaoHash(m);
         
-        if ((elementos[h] != NULL) and (elementos[h]->movimento == m)) {
-			for (int i = 0; i < 9; i++) {
-				cout << elementos[h]->movimento[i].linha << " " << elementos[h]->movimento[i].coluna << endl;
-			}
+        if ((elementos[h] != NULL) and (comparaMovimentos(elementos[h]->movimento, m))) {
+			//~ for (int i = 0; i < 9; i++) {
+				//~ cout << elementos[h]->movimento[i].linha << " " << elementos[h]->movimento[i].coluna << endl;
+			//~ }
             return "JA ESTA NO HASH";
         }
         else {
             noh* atual = elementos[h];
 
-            while ((atual != NULL) and !(atual->movimento == m)) {
+            while ((atual != NULL) and !(comparaMovimentos(atual->movimento, m))) {
                 atual = atual->proximo;
             }
 
-            if ((atual != NULL) and (atual->movimento == m)) {
+            if ((atual != NULL) and (comparaMovimentos(atual->movimento, m))) {
                 return "JA ESTA NO HASH";
             }
             else {
@@ -152,17 +161,17 @@ public:
 
         if(recupera(m) == "JA ESTA NO HASH"){
 			
-            if ((elementos[h] != NULL) and (elementos[h]->movimento == m)) {
+            if ((elementos[h] != NULL) and (comparaMovimentos(elementos[h]->movimento, m))) {
                 elementos[h]->nVitorias += 1;
             }
             else {
                 noh* atual = elementos[h];
 
-                while ((atual != NULL) and !(atual->movimento != m)) {
+                while ((atual != NULL) and !(comparaMovimentos(atual->movimento, m))) {
                     atual = atual->proximo;
                 }
 
-                if ((atual != NULL) and (atual->movimento == m)) {
+                if ((atual != NULL) and (comparaMovimentos(atual->movimento, m))) {
                     atual->nVitorias += 1;
                 }
                 else {
@@ -205,14 +214,21 @@ public:
                 bool jogada_ainda_serve = true;
                 // Verificando até a posição da jogada atual se é igual a jogada armazenada
                 for (int i = 0; i < numero_da_jogada and jogada_ainda_serve; i++) {
-                    if((m[i].linha != atual->movimento[i].linha) or (m[i].coluna != atual->movimento[i].coluna)){
-                        jogada_ainda_serve = false;
+                    if((m[i].linha == atual->movimento[i].linha) or (m[i].coluna == atual->movimento[i].coluna)){
+                        if(atual->movimento[numero_da_jogada].jogador == atual->vencedor and m[numero_da_jogada].jogador == '-'){
+							cout << "Encontrei uma jogada :)" << endl << endl;
+							return atual->movimento[numero_da_jogada].linha * 3 + atual->movimento[numero_da_jogada].coluna;
+						}
+                        
                     }
+                    else{
+						jogada_ainda_serve = false;
+					}
                 }
-                if(jogada_ainda_serve and (atual->movimento[numero_da_jogada].jogador == atual->vencedor)){
-                    cout << "Encontrei uma jogada :)" << endl << endl;
-                    return atual->movimento[numero_da_jogada].linha * 3 + atual->movimento[numero_da_jogada].coluna;
-                }
+                //~ if(jogada_ainda_serve and (atual->movimento[numero_da_jogada].jogador == atual->vencedor)){
+                    //~ cout << "Encontrei uma jogada :)" << endl << endl;
+                    //~ return atual->movimento[numero_da_jogada].linha * 3 + atual->movimento[numero_da_jogada].coluna;
+                //~ }
                 atual = atual->proximo;
             }
             // Se chegar aqui, gerar aleatorio também, não encontrou jogada igual
@@ -266,10 +282,10 @@ public:
             while (atual != NULL) {
                 cout << "[";
                 for (int i = 0; i < 9; i++) cout << "(" << atual->movimento[i].linha << " " << atual->movimento[i].coluna << " " << atual->movimento[i].jogador << ")";
-                cout << "/" << atual->vencedor << "/" << atual->nVitorias << "]->";
+                cout << "/" << atual->vencedor << "/" << atual->nVitorias << "]->" << endl;
                 atual = atual->proximo;
             }
-            cout << "NULL" << endl;
+            cout << "NULL" << endl << endl;
         }
     }
 
