@@ -88,7 +88,7 @@ public:
 
     //insere um valor v com chave c
     void insere(Movimento* m, char winner, int vitorias = 0) {
-        cout << "Inserindo no hash" << endl;
+        //cout << "Inserindo no hash" << endl;
         // Encontrando a posição para inserir
         int h;
         h = funcaoHash(m);       
@@ -98,7 +98,7 @@ public:
                 elementos[h] = new noh(m, winner, vitorias);
             }
             else {
-                cout << "colidiu" << endl;
+                //cout << "colidiu" << endl;
                 noh* atual = elementos[h];
 
                 //achando local para inserção
@@ -109,6 +109,8 @@ public:
                 noh* novo = new noh(m, winner);
                 atual->proximo = novo;
             }
+        } else if(recupera(m) == "JA ESTA NO HASH") {
+            altera(m);
         }
         else {
             cout << "Item ja esta na tabela2" << endl;
@@ -121,8 +123,7 @@ public:
         h = funcaoHash(m);
         
         if ((elementos[h] != NULL) and (elementos[h]->movimento == m)) {
-			for (int i = 0; i < 9; i++)
-			{
+			for (int i = 0; i < 9; i++) {
 				cout << elementos[h]->movimento[i].linha << " " << elementos[h]->movimento[i].coluna << endl;
 			}
             return "JA ESTA NO HASH";
@@ -170,6 +171,57 @@ public:
             }
         } else {
             cerr << "O jogo não está armazenado" << endl;
+        }
+    }
+
+    int gerarMovimentoAleatorio(char** tabuleiro){
+        int* posicoes_disponiveis = new int[9];
+        int quantidade_disponivel = 0;
+        // Verifica todas as posições disponíveis e adiciona elas em um vetor
+        for (int lin = 0; lin < 3; lin++) {
+            for (int col = 0; col < 3; col++){
+                if(tabuleiro[lin][col] == '-') {
+                    posicoes_disponiveis[quantidade_disponivel] = lin*3 + col;
+                    quantidade_disponivel++;
+                }
+            }
+        }
+        srand(time(NULL));
+        // Pega um indice aleatorio e retorna a posição atribuida a ele
+        int retorno = posicoes_disponiveis[rand() % quantidade_disponivel];
+        delete[] posicoes_disponiveis;
+
+        return retorno;
+        
+    }
+
+    int obterProximoMovimento(Movimento* m, int numero_da_jogada){
+        int h;
+        h = funcaoHash(m);
+        noh* atual = elementos[h];
+        if(atual != NULL) { 
+            while(atual != NULL) {
+                // Procurar jogada idêntica
+                bool jogada_ainda_serve = true;
+                // Verificando até a posição da jogada atual se é igual a jogada armazenada
+                for (int i = 0; i < numero_da_jogada and jogada_ainda_serve; i++) {
+                    if((m[i].linha != atual->movimento[i].linha) or (m[i].coluna != atual->movimento[i].coluna)){
+                        jogada_ainda_serve = false;
+                    }
+                }
+                if(jogada_ainda_serve and (atual->movimento[numero_da_jogada].jogador == atual->vencedor)){
+                    cout << "Encontrei uma jogada :)" << endl << endl;
+                    return atual->movimento[numero_da_jogada].linha * 3 + atual->movimento[numero_da_jogada].coluna;
+                }
+                atual = atual->proximo;
+            }
+            // Se chegar aqui, gerar aleatorio também, não encontrou jogada igual
+            cout << "Não encontrei uma jogada, vou gerar aleatorio :|" << endl << endl;
+            return -1;
+        } else {
+            cout << "Não encontrei uma jogada, vou gerar aleatorio :|" << endl << endl;
+            return -1;
+            // Não tem jogo em que o primeiro movimento é nesta posição, necessário gerar aleatorio
         }
     }
     /*
@@ -231,7 +283,7 @@ public:
 			cout << "Procurando jogos em arquivo." << endl;
             // Verificando quantos jogos estão armazenados
 			myFile.seekg(0, ios::end); // Posicionando o ponteiro no fim do arquivo
-            long nJogos = myFile.tellg()/((sizeof(Movimento)*9) +sizeof(char));
+            long nJogos = myFile.tellg()/((sizeof(Movimento)*9) + sizeof(char) + sizeof(int));
             cout << "Encontramos " << nJogos << " jogos armazenados" << endl;
             
             // Posicionando o ponteiro de leitura no inicio do arquivo para começar a ler
