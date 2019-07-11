@@ -33,3 +33,6 @@
 
 # Arquivos da IDE
 .vscode/
+
+# Arquivo binario criado pelo programa
+*.bin

@@ -5,7 +5,7 @@ using namespace std;
 
 
 typedef struct {
-    char jogador = ' ';
+    char jogador = '-';
     int linha = -1;
     int coluna = -1;
 } Movimento;
@@ -27,10 +27,14 @@ friend inline bool operator==(const noh& noh1, const noh& noh2);
         int nVitorias;
         noh* proximo;
     public:
-        noh(Movimento* m, char winner) {
-            movimento = m;
+        noh(Movimento* m, char winner, int vitorias = 0) {
+            // for (int i = 0; i < 9; i++) {
+            //     cout << m[i].linha << "*" << m[i].coluna << endl;
+            // }
+            movimento = new Movimento[9];
+            for (int i = 0; i < 9; i++) movimento[i] = m[i];
             vencedor = winner;
-            nVitorias = 0;
+            nVitorias = vitorias;
             proximo = NULL;
         }
         ~noh(){
@@ -83,15 +87,15 @@ public:
     }
 
     //insere um valor v com chave c
-    void insere(Movimento* m, char winner) {
+    void insere(Movimento* m, char winner, int vitorias = 0) {
         cout << "Inserindo no hash" << endl;
         // Encontrando a posição para inserir
         int h;
-        h = funcaoHash(m);
+        h = funcaoHash(m);       
 
         if (recupera(m) == "NAO ENCONTRADO!") {
             if (elementos[h] == NULL) {
-                elementos[h] = new noh(m, winner);
+                elementos[h] = new noh(m, winner, vitorias);
             }
             else {
                 cout << "colidiu" << endl;
@@ -218,47 +222,74 @@ public:
     }
 
     void carregarDadosArquivo(){
-		ifstream myFile("jogos.bin", ios::in);
-		system("clear");
+        // Abrindo o arquivo binario em modo leitura
+		ifstream myFile("jogos.bin", ios::in | ios::binary);
+		//system("clear");
+
+        // Se o arquivo existe e foi aberto, leia os dados
 		if(myFile){
 			cout << "Procurando jogos em arquivo." << endl;
-			myFile.seekg(0);
-			Movimento* mov;
+            // Verificando quantos jogos estão armazenados
+			myFile.seekg(0, ios::end); // Posicionando o ponteiro no fim do arquivo
+            long nJogos = myFile.tellg()/((sizeof(Movimento)*9) +sizeof(char));
+            cout << "Encontramos " << nJogos << " jogos armazenados" << endl;
+            
+            // Posicionando o ponteiro de leitura no inicio do arquivo para começar a ler
+            myFile.seekg(0); 
+			Movimento* movimentos = new Movimento[9];
 			char winner;
-			while(myFile.read(reinterpret_cast<char*>(mov), 9*sizeof(Movimento))){
+            int nVitorias = 0;
+
+            // Para cada jogo no arquivo
+			for(int i = 0; i < nJogos; i++){
+                // Lendo cada movimento do jogo
+                for (int j = 0; j < 9; j++) {
+                    myFile.read(reinterpret_cast<char*>(&(movimentos[j])), sizeof(Movimento));
+                }                            
 				myFile.read(reinterpret_cast<char*>(&winner), sizeof(char));
-				//~ myFile.write(reinterpret_cast<char*>(&nVit), sizeof(int));
-				insere(mov, winner);
+                myFile.read(reinterpret_cast<char*>(&(nVitorias)), sizeof(int));
+
+                // Inserindo o jogo lido na hash
+				insere(movimentos, winner, nVitorias);
+                // cout << "Winner " << winner << endl;
 			}
-			
 			myFile.close();
 		}
 		else{
-			cout << "Arquivo nao encontrado." << endl << endl;
+			cout << "Falha ao abrir o arquivo ou arquivo nao encontrado." << endl << endl;
 		}
     }
 
     void gravarDadosArquivo(){
-        ofstream myFile("jogos.bin", ios::trunc);
+        // Abrindo o arquivo em modo escrita, apagando todo o conteudo que já existia
+        ofstream myFile("jogos.bin", ios::trunc | ios::out | ios::binary);
+
+        // Verificando se o arquivo foi aberto
+        if(myFile) cout << "Arquivo criado com sucesso!" << endl;
+        else cout << "Erro ao salvar as jogadas" << endl;
+
+        // Posicionando o ponteiro de escrita no inicio do arquivo
 		myFile.seekp(0);
-		noh* atual;
-		Movimento* mov;
-		char winner;
-		//~ int nVit = 0;
-		for(int i = 0; i < capacidade; ++i){
-			atual = elementos[i];
-			if(atual != NULL){				
-				while (atual != NULL) {
-					mov = atual->movimento;
-					winner = atual->vencedor;
-					//~ nVit = elementos[i]->nVitorias
-					myFile.write(reinterpret_cast<char*>(mov), 9*sizeof(Movimento));
-					myFile.write(reinterpret_cast<char*>(&winner), sizeof(char));
-					//~ myFile.write(reinterpret_cast<char*>(&nVit), sizeof(int));
-					atual = atual->proximo;
-				}
-			}
-		}
+		
+        // Percorre em todas as posições do Hash
+        for (int i = 0; i < capacidade; i++) {
+            noh* atual = elementos[i];
+            if(atual != NULL) {
+                //Grava no arquivo
+                while(atual != NULL) {
+                    for(int j = 0; j < 9; j++){
+                        // cout << "Nova linha: " << atual->movimento[j].linha << " "  << atual->movimento[j].coluna << endl;
+                        myFile.write(reinterpret_cast<char*>(&(atual->movimento[j])), sizeof(Movimento));
+                    }
+                    myFile.write(reinterpret_cast<char*>(&(atual->vencedor)), sizeof(char));
+                    myFile.write(reinterpret_cast<char*>(&(atual->nVitorias)), sizeof(int));
+
+                    atual = atual->proximo;                  
+                }
+            }
+        }
+        cout << "Cada jogo no arquivo ocupa cerca de " << sizeof(Movimento)*9 + sizeof(char) + sizeof(int) << " bytes." << endl;
+        
 		myFile.close();
     }
 };

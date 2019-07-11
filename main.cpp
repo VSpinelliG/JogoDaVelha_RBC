@@ -72,12 +72,18 @@ char** novoTabuleiro(){
 }
 
 int main() {
+
+    tabelaHash minhaHash;
+    minhaHash.carregarDadosArquivo();
+    minhaHash.percorre();
+
     int tipoJogo;
     cout << "0 - Jogador contra Jogador" << endl;
     cout << "1 - Jogador contra Maquina" << endl;
     cout << "2 - Maquina contra Maquina (Treino)" << endl;
     cout << "Selecione o modo de jogo: ";
     cin >> tipoJogo;
+
     /*
     //Criando o tabuleiro
     char** tabuleiro = new char*[3];
@@ -85,12 +91,7 @@ int main() {
         tabuleiro[lin] = new char[3];
     }
     */
-    tabelaHash minhaHash;
-    minhaHash.carregarDadosArquivo();
-    minhaHash.percorre();
     
-
-
     switch(tipoJogo) {
         case 0:
             {     
@@ -205,7 +206,7 @@ int main() {
                     minhaHash.insere(movimentos, jogador1);
                     ++i;
                     
-                    //delete[] movimentos;
+                    delete[] movimentos;
                     delete[] vetor;
                     
                     for (int k = 0; k < 3; ++k){
@@ -215,7 +216,6 @@ int main() {
                         cout << endl;
                     }
                 
-
                     // Desalocando o tabuleiro
                     for (int v = 0; v < 3; v++) {
                         delete[] tabuleiro[v];
@@ -228,5 +228,6 @@ int main() {
 
     minhaHash.percorre();
     minhaHash.gravarDadosArquivo();
+    
     return 0;
 }
